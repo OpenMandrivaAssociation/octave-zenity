@@ -1,44 +1,39 @@
-%define	pkgname zenity
+%define octpkg zenity
 
 Summary:	Octave functions for creating simple GUIs
-Name:       octave-%{pkgname}
+Name:		octave-%{octpkg}
 Version:	0.5.7
-Release:	5
-Source0:	%{pkgname}-%{version}.tar.gz
+Release:	1
+Source0:	http://downloads.sourceforge.net/octave/%{octpkg}-%{version}.tar.gz
 License:	GPLv2+
 Group:		Sciences/Mathematics
-Url:		http://octave.sourceforge.net/zenity/
-Requires:	zenity >= 2.16
-BuildRequires:  octave-devel >= 2.9.9
-BuildRequires:  pkgconfig(gl)
-BuildRequires:  pkgconfig(glu)
+Url:		https://octave.sourceforge.io/%{octpkg}/
 BuildArch:	noarch
-Requires:       octave(api) = %{octave_api}
+
+BuildRequires:	octave-devel >= 2.9.9
+
+Requires:	octave(api) = %{octave_api}
+Requires:	zenity >= 2.16
+
 Requires(post): octave
 Requires(postun): octave
 
 %description
-This package provides a set of Octave functions for creating simple
-graphical user interfaces. It is currently possible to create calendar
-windows, text entries, file selection dialogs, lists, message windows,
-icons in the notification area, and windows for large amount of text.
+A set of functions for creating simple graphical user interfaces. It is
+currently possible to create  calendar windows, text entries, file
+selection dialogs, lists, message windows, icons in the notification area,
+and windows for large amount of text.
+
+This package is part of unmantained Octave-Forge collection.
 
 %prep
-%setup -q -c %{pkgname}-%{version}
-cp %{SOURCE0} .
+%setup -qcT
+
+%build
+%octave_pkg_build -T
 
 %install
-%__install -m 755 -d %{buildroot}%{_datadir}/octave/packages/
-export OCT_PREFIX=%{buildroot}%{_datadir}/octave/packages
-octave -q --eval "pkg prefix $OCT_PREFIX; pkg install -verbose -nodeps -local %{pkgname}-%{version}.tar.gz"
-touch %{buildroot}%{_datadir}/octave/packages/%{pkgname}-%{version}/packinfo/.autoload
-chmod 644 %{buildroot}%{_datadir}/octave/packages/%{pkgname}-%{version}/packinfo/.autoload
-
-tar zxf %{SOURCE0} 
-mv %{pkgname}-%{version}/COPYING .
-mv %{pkgname}-%{version}/DESCRIPTION .
-
-%clean
+%octave_pkg_install
 
 %post
 %octave_cmd pkg rebuild
@@ -50,5 +45,8 @@ mv %{pkgname}-%{version}/DESCRIPTION .
 %octave_cmd pkg rebuild
 
 %files
-%doc COPYING DESCRIPTION
-%{_datadir}/octave/packages/%{pkgname}-%{version}
+%dir %{octpkgdir}
+%{octpkgdir}/*
+#%doc %{octpkg}-%{version}/NEWS
+%doc %{octpkg}-%{version}/COPYING
+
