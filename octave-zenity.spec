@@ -1,19 +1,19 @@
-%define octpkg zenity
+%global octpkg zenity
 
 Summary:	Octave functions for creating simple GUIs
 Name:		octave-%{octpkg}
 Version:	0.5.7
 Release:	1
-Source0:	http://downloads.sourceforge.net/octave/%{octpkg}-%{version}.tar.gz
+Url:		https://octave.sourceforge.io/%{octpkg}/
+Source0:	https://downloads.sourceforge.net/octave/%{octpkg}-%{version}.tar.gz
 License:	GPLv2+
 Group:		Sciences/Mathematics
-Url:		https://octave.sourceforge.io/%{octpkg}/
 BuildArch:	noarch
 
 BuildRequires:	octave-devel >= 2.9.9
 
 Requires:	octave(api) = %{octave_api}
-Requires:	zenity >= 2.16
+Requires:	zenity
 
 Requires(post): octave
 Requires(postun): octave
@@ -26,14 +26,35 @@ and windows for large amount of text.
 
 This package is part of unmantained Octave-Forge collection.
 
+%files
+%license COPYING
+#doc NEWS
+%dir %{octpkgdir}
+%{octpkgdir}/*
+
+#---------------------------------------------------------------------------
+
 %prep
-%setup -qcT
+%autosetup -p1 -n %{octpkg}-%{version}
+
+# convert to utf8
+for f in DESCRIPTION inst/*m
+do
+	iconv -f ISO-8859-1 -t UTF-8 -o "${f}".utf8 "${f}"
+	mv ${f}.utf8 ${f}
+done
+
+# remove backup files
+#find . -name \*~ -delete
 
 %build
-%octave_pkg_build -T
+%octave_pkg_build
 
 %install
 %octave_pkg_install
+
+%check
+%octave_pkg_check
 
 %post
 %octave_cmd pkg rebuild
@@ -43,10 +64,4 @@ This package is part of unmantained Octave-Forge collection.
 
 %postun
 %octave_cmd pkg rebuild
-
-%files
-%dir %{octpkgdir}
-%{octpkgdir}/*
-#%doc %{octpkg}-%{version}/NEWS
-%doc %{octpkg}-%{version}/COPYING
 
